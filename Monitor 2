@@ -1,0 +1,41 @@
+// ==UserScript==
+// @name         Script Monitor 2
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Watches and reinstalls Script Monitor 1
+// @author       Miss
+// @match        *://*/*
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_xmlhttpRequest
+// @run-at       document-start
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    const monitoredScript = "Script Monitor 1";
+
+    // Check if Script Monitor 1 is present
+    setInterval(() => {
+        if (!GM_getValue("script1_active")) {
+            alert(`${monitoredScript} is missing! Reinstalling...`);
+            reinstallScript1();
+        }
+    }, 5000);
+
+    // Function to reinstall Script Monitor 1
+    function reinstallScript1() {
+        const script1URL = "https://your-script-1-url-goes-here"; // Replace with raw URL to Script 1
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: script1URL,
+            onload: function(response) {
+                GM_setValue("script1_active", true);
+                eval(response.responseText);
+            }
+        });
+    }
+
+    GM_setValue("script2_active", true); // Mark this script as active
+})();
