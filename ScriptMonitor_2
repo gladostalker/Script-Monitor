@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Ultimate Monitor 1
+// @name         Ultimate Monitor 2
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  Watches and enforces Ultimate Monitor 2
@@ -37,7 +37,7 @@
         }
     });
 
-    // Monitor and Reinstall Ultimate Monitor 2
+    // Monitor and Reinstall Ultimate Monitor 1
     setInterval(() => {
         if (!GM_getValue("script2_active")) {
             alert(`${monitoredScript} is missing! Reinstalling...`);
