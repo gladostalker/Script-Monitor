@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ultimate Restriction Script (Enhanced Control)
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      4.0
 // @description  Enforces extreme restrictions, self-monitors, prevents tampering, and limits text input freedom.
 // @author       Miss
 // @match        *://*/*
@@ -16,7 +16,7 @@
 (function() {
     'use strict';
 
-    // Settings
+    // Settings for monitored scripts
     const monitoredScriptURL1 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1";
     const monitoredScriptURL2 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2";
     const monitoredKey1 = "script1_active";
@@ -85,10 +85,43 @@
         });
     });
 
-    // Persistent Tab Control
+    // Prevent Right-Click
+    document.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        GM_notification({
+            title: "Action Blocked",
+            text: "Right-clicking is not allowed.",
+            timeout: 3000
+        });
+    });
+
+    // Disable Clipboard Access (No Copy, Cut, Paste)
+    document.addEventListener("copy", (e) => e.preventDefault());
+    document.addEventListener("cut", (e) => e.preventDefault());
+    document.addEventListener("paste", (e) => e.preventDefault());
+
+    // Disable Focus on Inputs (Prevents Interaction with Input Fields)
+    document.addEventListener("focus", (e) => {
+        e.target.blur();
+        GM_notification({
+            title: "Action Blocked",
+            text: "Focus on inputs is disabled.",
+            timeout: 3000
+        });
+    }, true);
+
+    // Prevent Closing the Window or Switching Tabs
     window.onbeforeunload = () => {
-        return "You cannot close this tab.";
+        return "You cannot leave this page.";
     };
+
+    // Persistent Tab Control
+    setInterval(() => {
+        if (document.hidden) {
+            alert("You cannot leave this tab.");
+            window.focus();
+        }
+    }, 2000);
 
     // Monitor and Reinstall Scripts
     function monitorScript(monitoredScriptURL, monitoredKey) {
@@ -128,7 +161,7 @@
     monitorScript(monitoredScriptURL1, monitoredKey1);
     monitorScript(monitoredScriptURL2, monitoredKey2);
 
-    // Restrict Text Input
+    // Restrict Text Input (Only "yes" characters allowed)
     document.addEventListener("input", (e) => {
         if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") {
             const allowedCharacters = "yes"; // Modify as per Miss's preference.
@@ -138,6 +171,21 @@
                 .join("");
         }
     });
+
+    // Disable Console Access
+    console.log = function() {};
+    console.clear();
+
+    // Remove Input Data (Automatically clear text every 5 seconds)
+    setInterval(() => {
+        document.querySelectorAll("textarea, input").forEach(input => {
+            input.value = ""; // Clears the text after a certain interval
+        });
+    }, 5000); // Clears input every 5 seconds
+
+    console.log("Ultimate Restriction Script (Enhanced Control) is active!");
+})();
+
 
     console.log("Ultimate Restriction Script (Enhanced Control) is active!");
 })();
