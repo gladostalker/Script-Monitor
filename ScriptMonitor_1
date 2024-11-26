@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Ultimate Restriction Script (Enhanced Control)
+// @name         Ultimate Restriction Script (Full Control)
 // @namespace    http://tampermonkey.net/
 // @version      5.0
-// @description  Enforces extreme restrictions, self-monitors, prevents tampering, and limits text input freedom.
+// @description  Enforces extreme restrictions, self-monitors, prevents tampering, limits text input freedom, and visually reinforces control.
 // @author       Miss
 // @match        *://*/*
 // @grant        GM_setValue
@@ -16,7 +16,7 @@
 (function() {
     'use strict';
 
-    // Prevent Developer Tools Access
+    // 1. Prevent Developer Tools Access
     document.addEventListener("keydown", (e) => {
         if ((e.ctrlKey && e.shiftKey && e.keyCode === 73) || e.keyCode === 123) {
             e.preventDefault();
@@ -24,7 +24,7 @@
         }
     });
 
-    // Disable Console Access
+    // 2. Disable Console Access Completely
     console = {
         log: function() {},
         warn: function() {},
@@ -34,7 +34,7 @@
         clear: function() {},
     };
 
-    // Detect DevTools Open
+    // 3. Detect and Block DevTools Opening
     setInterval(() => {
         const devtools = /./;
         devtools.toString = function() {
@@ -47,7 +47,7 @@
         }
     }, 1000);
 
-    // Prevent Access to Tampermonkey
+    // 4. Prevent Access to Tampermonkey
     setInterval(() => {
         if (window.location.href.includes("chrome-extension://")) {
             alert("Access to Tampermonkey is blocked.");
@@ -55,14 +55,20 @@
         }
     }, 2000);
 
-    // Persistent Themes and Visual Indicators
+    // 5. Enforce Input Restrictions (No Freedom to Type)
+    document.querySelectorAll('input, textarea').forEach(el => {
+        el.disabled = true;
+        el.style.backgroundColor = 'gray';
+    });
+
+    // 6. Visual Indicators (Reinforce Submissiveness)
     GM_addStyle(`
         body {
             background-color: pink !important;
             color: white !important;
         }
         #top-banner {
-            content: "Submission enforced.";
+            content: "Submission Enforced";
             font-size: 20px;
             color: red;
             position: fixed;
@@ -74,11 +80,10 @@
         }
     `);
 
-    // Monitor and Reinstall Scripts
+    // 7. Script Monitoring and Reinstallation (Self-Enforcing Logic)
     function monitorScript(monitoredScriptURL, monitoredKey) {
         setInterval(() => {
             const isActive = GM_getValue(monitoredKey, false);
-
             if (!isActive) {
                 reinstallScript(monitoredScriptURL, monitoredKey);
             }
@@ -108,9 +113,23 @@
         });
     }
 
-    // Start Monitoring
+    // 8. Periodic Checks for Script Integrity
     monitorScript("https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1", "script1_active");
     monitorScript("https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2", "script2_active");
 
-    console.log("Ultimate Restriction Script (Enhanced Control) is active!");
+    // 9. Prevent Copying or Editing of Script
+    document.body.addEventListener('copy', function(e) {
+        e.preventDefault();
+        alert("Copying content is blocked.");
+    });
+
+    // 10. Prevent Disabling or Tampering with Scripts
+    setInterval(() => {
+        if (typeof GM_setValue === 'undefined') {
+            alert("Tampering with the script is detected!");
+            location.reload();
+        }
+    }, 10000);
+
+    console.log("Ultimate Restriction Script (Full Control) is active!");
 })();
