@@ -48,12 +48,14 @@
     }, 1000);
 
     // 4. Prevent Access to Tampermonkey
-    setInterval(() => {
-        if (window.location.href.includes("chrome-extension://")) {
-            alert("Access to Tampermonkey is blocked.");
-            window.close();
-        }
-    }, 2000);
+setInterval(() => {
+    // Check if the current URL matches Tampermonkey's settings page URL format
+    if (window.location.href.startsWith("chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/options.html") &&
+        window.location.href.includes("nav=dashboard")) {
+        alert("Access to Tampermonkey is blocked.");
+        window.location.href = "about:blank"; // Redirect to a harmless page
+    }
+}, 2000);
 
     // 5. Enforce Input Restrictions (No Freedom to Type)
     document.querySelectorAll('input, textarea').forEach(el => {
@@ -61,24 +63,6 @@
         el.style.backgroundColor = 'gray';
     });
 
-    // 6. Visual Indicators (Reinforce Submissiveness)
-    GM_addStyle(`
-        body {
-            background-color: pink !important;
-            color: white !important;
-        }
-        #top-banner {
-            content: "Submission Enforced";
-            font-size: 20px;
-            color: red;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 1000;
-            background-color: black;
-        }
-    `);
 
     // 7. Script Monitoring and Reinstallation (Self-Enforcing Logic)
     function monitorScript(monitoredScriptURL, monitoredKey) {
@@ -124,16 +108,18 @@
     });
 
     // 10. Prevent Disabling or Tampering with Scripts
-    setInterval(() => {
-        if (typeof GM_setValue === 'undefined') {
-            alert("Tampering with the script is detected!");
-            location.reload();
+setInterval(() => {
+    try {
+        GM_setValue("test", "value"); // Attempt to use GM_setValue
+        const testValue = GM_getValue("test", null); // Verify it works
+        if (testValue !== "value") {
+            throw new Error("GM_setValue tampered!");
         }
-    }, 10000);
-
-    console.log("Ultimate Restriction Script (Full Control) is active!");
-})();
-// [Existing Ultimate Script Code Here]
+    } catch (error) {
+        alert("Tampering with the script is detected!");
+        location.reload(); // Reload the page to restore scripts
+    }
+}, 10000);
 
 // 11. Disable Right-Click and Context Menu
 document.addEventListener('contextmenu', function (e) {
@@ -242,39 +228,16 @@ setInterval(() => {
     }
 }, 60000);  // Check every minute
 
-// 22. Forced Reflection and Reaffirmation Tasks
-function reaffirmRole() {
-    const reflection = prompt("Reflect on your role and submit 3 sentences reaffirming your submission and place.");
-    
-    if (reflection) {
-        alert("Your reflection has been noted. Continue serving.");
-        GM_setValue('taskCompleted', true); 
-    } else {
-        alert("You failed to complete your reflection. Try again and remember your place.");
-        GM_setValue('taskCompleted', false);
-    }
-}
-
 window.addEventListener('load', reaffirmRole);
 // 23. Inability to Close the Browser
 (function() {
     window.onbeforeunload = function() {
         return "You cannot leave. You must stay and continue serving.";
     };
-    
+
     window.addEventListener('beforeunload', function(event) {
         event.preventDefault();
         event.returnValue = '';
         alert("You cannot close this window. Your service is required.");
-    });
-})();
-
-// 24. Disabling Text Selection
-(function() {
-    document.body.style.userSelect = 'none'; // Disable text selection
-    
-    document.body.addEventListener('mousedown', function(e) {
-        e.preventDefault(); // Prevent right-click and text selection actions
-        alert("You cannot select text. Remember your place and serve.");
     });
 })();
