@@ -149,14 +149,6 @@ document.querySelectorAll('a').forEach(anchor => {
     });
 });
 
-// 13. Prevent Screenshot Taking
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'PrintScreen') {
-        e.preventDefault();
-        alert("Screenshot is disabled.");
-    }
-});
-
 // 14. Time-Limited Restrictions (Example: 1 hour)
 setTimeout(() => {
     alert("The restriction period is over. You've completed your session.");
