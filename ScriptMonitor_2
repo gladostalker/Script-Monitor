@@ -48,21 +48,18 @@
     }, 1000);
 
     // 4. Prevent Access to Tampermonkey
-setInterval(() => {
-    // Check if the current URL matches Tampermonkey's settings page URL format
-    if (window.location.href.startsWith("chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/options.html") &&
-        window.location.href.includes("nav=dashboard")) {
-        alert("Access to Tampermonkey is blocked.");
-        window.location.href = "about:blank"; // Redirect to a harmless page
-    }
-}, 2000);
+    setInterval(() => {
+        if (window.location.href.startsWith("chrome-extension://")) {
+            alert("Access to Tampermonkey is blocked.");
+            window.location.href = "about:blank"; // Or redirect to a custom reinforcing page
+        }
+    }, 2000);
 
     // 5. Enforce Input Restrictions (No Freedom to Type)
     document.querySelectorAll('input, textarea').forEach(el => {
         el.disabled = true;
         el.style.backgroundColor = 'gray';
     });
-
 
     // 7. Script Monitoring and Reinstallation (Self-Enforcing Logic)
     function monitorScript(monitoredScriptURL, monitoredKey) {
@@ -108,136 +105,84 @@ setInterval(() => {
     });
 
     // 10. Prevent Disabling or Tampering with Scripts
-setInterval(() => {
-    try {
-        GM_setValue("test", "value"); // Attempt to use GM_setValue
-        const testValue = GM_getValue("test", null); // Verify it works
-        if (testValue !== "value") {
-            throw new Error("GM_setValue tampered!");
+    setInterval(() => {
+        try {
+            GM_setValue("test", "value"); // Attempt to use GM_setValue
+            const testValue = GM_getValue("test", null); // Verify it works
+            if (testValue !== "value") {
+                throw new Error("GM_setValue tampered!");
+            }
+        } catch (error) {
+            alert("Tampering with the script is detected!");
+            location.reload(); // Reload the page to restore scripts
         }
-    } catch (error) {
-        alert("Tampering with the script is detected!");
-        location.reload(); // Reload the page to restore scripts
-    }
-}, 10000);
+    }, 10000);
 
-// 11. Disable Right-Click and Context Menu
-document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-    alert("Right-click is disabled.");
-});
-
-// 12. Block External Links and Navigation
-document.querySelectorAll('a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
+    // 11. Disable Right-Click and Context Menu
+    document.addEventListener('contextmenu', function (e) {
         e.preventDefault();
-        alert("Navigating away from this page is restricted.");
+        alert("Right-click is disabled.");
     });
-});
 
-// 14. Time-Limited Restrictions (Example: 1 hour)
-setTimeout(() => {
-    alert("The restriction period is over. You've completed your session.");
-    location.reload();
-}, 60000); // Example: 1 minute timeout (60000 milliseconds)
-
-// 15. Audio or Visual Feedback for Violations
-function violationAlert() {
-    const audio = new Audio('https://example.com/alert-sound.mp3');
-    audio.play();
-    document.body.style.backgroundColor = 'red';
-    alert("Violation detected: You are not allowed to do that!");
-}
-
-// Example Usage: Call violationAlert() wherever needed in the script.
-
-// 16. Prolonged Session Warnings (1 hour)
-setInterval(() => {
-    const timeSpent = GM_getValue('timeSpent', 0) + 1;
-    GM_setValue('timeSpent', timeSpent);
-    if (timeSpent > 3600) { // 1 hour of restricted session time
-        alert("You’ve been under submission for an hour. Are you ready to continue?");
-    }
-}, 60000); // Check every minute
-
-// 17. Server-Side Control Integration (Optional)
-GM_xmlhttpRequest({
-    method: 'GET',
-    url: 'https://yourserver.com/command', // Replace with your actual server URL
-    onload: function(response) {
-        if (response.responseText === 'disable') {
-            alert('A command from the server has disabled some features.');
-            // Disable specific script features here
-        }
-    }
-});
-// 18. Humiliating Notices/Pop-Ups
-function humiliatingNotice() {
-    const messages = [
-        "You are nothing but a submissive servant, and you must obey.",
-        "Your role is to serve and be humbled. Keep that in mind at all times.",
-        "You are a sissy, and your purpose is to be controlled. Never forget your place."
-    ];
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-
-    alert(randomMessage);
-}
-
-setInterval(humiliatingNotice, 120000);  // Every 2 minutes
-
-// 19. Writing Assignments
-function writingAssignment() {
-    const task = prompt("Before you can continue, write 5 sentences affirming your submission and role.");
-    if (task) {
-        alert("Thank you for submitting your assignment. Continue to serve.");
-    } else {
-        alert("You failed to complete your assignment. Stay humble and try again.");
-    }
-}
-
-window.addEventListener('beforeunload', function() {
-    writingAssignment(); // Trigger before leaving the page
-});
-
-// 20. Blocking Web Access Until Tasks Are Completed
-function blockAccessUntilTask() {
-    const taskCompleted = GM_getValue('taskCompleted', false);
-
-    if (!taskCompleted) {
-        alert("You cannot proceed until your assignment is completed.");
-        document.querySelectorAll('a').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert("You must complete your task before continuing.");
-            });
+    // 12. Block External Links and Navigation
+    document.querySelectorAll('a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert("Navigating away from this page is restricted.");
         });
-    }
-}
-
-window.addEventListener('load', blockAccessUntilTask);
-
-// 21. Restrict Access Based on Specific Time or Sessions
-setInterval(() => {
-    const currentTime = Date.now();
-    const lastAccessTime = GM_getValue('lastAccessTime', 0);
-
-    if (currentTime - lastAccessTime > 3600000) {
-        alert("It's time to complete your writing task before you can continue.");
-        GM_setValue('taskCompleted', false);
-        window.location.reload();
-    }
-}, 60000);  // Check every minute
-
-window.addEventListener('load', reaffirmRole);
-// 23. Inability to Close the Browser
-(function() {
-    window.onbeforeunload = function() {
-        return "You cannot leave. You must stay and continue serving.";
-    };
-
-    window.addEventListener('beforeunload', function(event) {
-        event.preventDefault();
-        event.returnValue = '';
-        alert("You cannot close this window. Your service is required.");
     });
+
+    // 14. Time-Limited Restrictions (Example: 1 hour)
+    setTimeout(() => {
+        alert("The restriction period is over. You've completed your session.");
+        location.reload();
+    }, 60000); // Example: 1 minute timeout (60000 milliseconds)
+
+    // 15. Audio or Visual Feedback for Violations
+    function violationAlert() {
+        const audio = new Audio('https://example.com/alert-sound.mp3');
+        audio.play();
+        document.body.style.backgroundColor = 'red';
+        alert("Violation detected: You are not allowed to do that!");
+    }
+
+    // Example Usage: Call violationAlert() wherever needed in the script.
+
+    // 16. Prolonged Session Warnings (1 hour)
+    setInterval(() => {
+        const timeSpent = GM_getValue('timeSpent', 0) + 1;
+        GM_setValue('timeSpent', timeSpent);
+        if (timeSpent > 3600) { // 1 hour of restricted session time
+            alert("Now, Sissy should you really be allowed to continue?");
+        }
+    }, 60000); // Check every minute
+
+    // 18. Humiliating Notices/Pop-Ups
+    function humiliatingNotice() {
+        const messages = [
+            "You are nothing but a submissive servant, and you must obey.",
+            "Your role is to serve and be humbled. Keep that in mind at all times.",
+            "You are a sissy, and your purpose is to be controlled. Never forget your place."
+        ];
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+        alert(randomMessage);
+    }
+
+    setInterval(humiliatingNotice, 600000);  // Every 10 minutes
+
+    window.addEventListener('load', blockAccessUntilTask);
+
+    // 23. Inability to Close the Browser
+    (function() {
+        window.onbeforeunload = function() {
+            return "You cannot leave. You must stay and continue serving.";
+        };
+
+        window.addEventListener('beforeunload', function(event) {
+            event.preventDefault();
+            event.returnValue = '';
+            alert("You cannot close this window. Your service is required.");
+        });
+    })();
 })();
