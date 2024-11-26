@@ -133,3 +133,156 @@
 
     console.log("Ultimate Restriction Script (Full Control) is active!");
 })();
+// [Existing Ultimate Script Code Here]
+
+// 11. Disable Right-Click and Context Menu
+document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    alert("Right-click is disabled.");
+});
+
+// 12. Block External Links and Navigation
+document.querySelectorAll('a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert("Navigating away from this page is restricted.");
+    });
+});
+
+// 13. Prevent Screenshot Taking
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        alert("Screenshot is disabled.");
+    }
+});
+
+// 14. Time-Limited Restrictions (Example: 1 hour)
+setTimeout(() => {
+    alert("The restriction period is over. You've completed your session.");
+    location.reload();
+}, 60000); // Example: 1 minute timeout (60000 milliseconds)
+
+// 15. Audio or Visual Feedback for Violations
+function violationAlert() {
+    const audio = new Audio('https://example.com/alert-sound.mp3');
+    audio.play();
+    document.body.style.backgroundColor = 'red';
+    alert("Violation detected: You are not allowed to do that!");
+}
+
+// Example Usage: Call violationAlert() wherever needed in the script.
+
+// 16. Prolonged Session Warnings (1 hour)
+setInterval(() => {
+    const timeSpent = GM_getValue('timeSpent', 0) + 1;
+    GM_setValue('timeSpent', timeSpent);
+    if (timeSpent > 3600) { // 1 hour of restricted session time
+        alert("You’ve been under submission for an hour. Are you ready to continue?");
+    }
+}, 60000); // Check every minute
+
+// 17. Server-Side Control Integration (Optional)
+GM_xmlhttpRequest({
+    method: 'GET',
+    url: 'https://yourserver.com/command', // Replace with your actual server URL
+    onload: function(response) {
+        if (response.responseText === 'disable') {
+            alert('A command from the server has disabled some features.');
+            // Disable specific script features here
+        }
+    }
+});
+// 18. Humiliating Notices/Pop-Ups
+function humiliatingNotice() {
+    const messages = [
+        "You are nothing but a submissive servant, and you must obey.",
+        "Your role is to serve and be humbled. Keep that in mind at all times.",
+        "You are a sissy, and your purpose is to be controlled. Never forget your place."
+    ];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+    alert(randomMessage);
+}
+
+setInterval(humiliatingNotice, 120000);  // Every 2 minutes
+
+// 19. Writing Assignments
+function writingAssignment() {
+    const task = prompt("Before you can continue, write 5 sentences affirming your submission and role.");
+    if (task) {
+        alert("Thank you for submitting your assignment. Continue to serve.");
+    } else {
+        alert("You failed to complete your assignment. Stay humble and try again.");
+    }
+}
+
+window.addEventListener('beforeunload', function() {
+    writingAssignment(); // Trigger before leaving the page
+});
+
+// 20. Blocking Web Access Until Tasks Are Completed
+function blockAccessUntilTask() {
+    const taskCompleted = GM_getValue('taskCompleted', false);
+
+    if (!taskCompleted) {
+        alert("You cannot proceed until your assignment is completed.");
+        document.querySelectorAll('a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert("You must complete your task before continuing.");
+            });
+        });
+    }
+}
+
+window.addEventListener('load', blockAccessUntilTask);
+
+// 21. Restrict Access Based on Specific Time or Sessions
+setInterval(() => {
+    const currentTime = Date.now();
+    const lastAccessTime = GM_getValue('lastAccessTime', 0);
+
+    if (currentTime - lastAccessTime > 3600000) {
+        alert("It's time to complete your writing task before you can continue.");
+        GM_setValue('taskCompleted', false);
+        window.location.reload();
+    }
+}, 60000);  // Check every minute
+
+// 22. Forced Reflection and Reaffirmation Tasks
+function reaffirmRole() {
+    const reflection = prompt("Reflect on your role and submit 3 sentences reaffirming your submission and place.");
+    
+    if (reflection) {
+        alert("Your reflection has been noted. Continue serving.");
+        GM_setValue('taskCompleted', true); 
+    } else {
+        alert("You failed to complete your reflection. Try again and remember your place.");
+        GM_setValue('taskCompleted', false);
+    }
+}
+
+window.addEventListener('load', reaffirmRole);
+// 23. Inability to Close the Browser
+(function() {
+    window.onbeforeunload = function() {
+        return "You cannot leave. You must stay and continue serving.";
+    };
+    
+    window.addEventListener('beforeunload', function(event) {
+        event.preventDefault();
+        event.returnValue = '';
+        alert("You cannot close this window. Your service is required.");
+    });
+})();
+
+// 24. Disabling Text Selection
+(function() {
+    document.body.style.userSelect = 'none'; // Disable text selection
+    
+    document.body.addEventListener('mousedown', function(e) {
+        e.preventDefault(); // Prevent right-click and text selection actions
+        alert("You cannot select text. Remember your place and serve.");
+    });
+})();
