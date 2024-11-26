@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Ultimate Restriction Script (Enhanced Control)
+// @name         Ultimate Restriction Script (Full Control)
 // @namespace    http://tampermonkey.net/
-// @version      4.0
-// @description  Enforces extreme restrictions, self-monitors, prevents tampering, and limits text input freedom.
+// @version      5.0
+// @description  Enforces extreme restrictions, self-monitors, prevents tampering, limits text input freedom, and visually reinforces control.
 // @author       Miss
 // @match        *://*/*
 // @grant        GM_setValue
@@ -16,45 +16,59 @@
 (function() {
     'use strict';
 
-    // Settings for monitored scripts
-    const monitoredScriptURL1 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1";
-    const monitoredScriptURL2 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2";
-    const monitoredKey1 = "script1_active";
-    const monitoredKey2 = "script2_active";
+    // 1. Prevent Developer Tools Access
+    document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey && e.shiftKey && e.keyCode === 73) || e.keyCode === 123) {
+            e.preventDefault();
+            alert("Developer Tools access is disabled.");
+        }
+    });
 
-    // Prevent Access to Tampermonkey and Restricted Sites
-    const prohibitedSites = ["tampermonkey", "chrome://extensions"];
+    // 2. Disable Console Access Completely
+    console = {
+        log: function() {},
+        warn: function() {},
+        error: function() {},
+        info: function() {},
+        debug: function() {},
+        clear: function() {},
+    };
+
+    // 3. Detect and Block DevTools Opening
     setInterval(() => {
-        prohibitedSites.forEach(site => {
-            if (window.location.href.includes(site)) {
-                alert("Access to this site is restricted.");
-                window.close();
-            }
-        });
-    }, 5000);
-
-    // Monitor DevTools Usage
-    const detectDevTools = () => {
         const devtools = /./;
         devtools.toString = function() {
             this.opened = true;
         };
         console.log("%c", devtools);
         if (devtools.opened) {
-            alert("Developer Tools access is restricted.");
+            alert("Developer Tools access is restricted!");
             location.reload();
         }
-    };
-    setInterval(detectDevTools, 1000);
+    }, 1000);
 
-    // Persistent Themes and Visual Indicators
+    // 4. Prevent Access to Tampermonkey
+    setInterval(() => {
+        if (window.location.href.includes("chrome-extension://")) {
+            alert("Access to Tampermonkey is blocked.");
+            window.close();
+        }
+    }, 2000);
+
+    // 5. Enforce Input Restrictions (No Freedom to Type)
+    document.querySelectorAll('input, textarea').forEach(el => {
+        el.disabled = true;
+        el.style.backgroundColor = 'gray';
+    });
+
+    // 6. Visual Indicators (Reinforce Submissiveness)
     GM_addStyle(`
         body {
             background-color: pink !important;
             color: white !important;
         }
         #top-banner {
-            content: "Submission enforced.";
+            content: "Submission Enforced";
             font-size: 20px;
             color: red;
             position: fixed;
@@ -66,68 +80,10 @@
         }
     `);
 
-    // Disable Common Keyboard Shortcuts
-    document.addEventListener("keydown", (e) => {
-        const blockedKeys = [
-            { ctrl: true, shift: true, key: "I" },
-            { ctrl: true, shift: true, key: "A" },
-            { ctrl: true, key: "W" }
-        ];
-        blockedKeys.forEach(shortcut => {
-            if (e.ctrlKey === shortcut.ctrl && e.shiftKey === shortcut.shift && e.key.toUpperCase() === shortcut.key) {
-                e.preventDefault();
-                GM_notification({
-                    title: "Action Blocked",
-                    text: `Shortcut "${shortcut.key}" is not allowed.`,
-                    timeout: 3000
-                });
-            }
-        });
-    });
-
-    // Prevent Right-Click
-    document.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        GM_notification({
-            title: "Action Blocked",
-            text: "Right-clicking is not allowed.",
-            timeout: 3000
-        });
-    });
-
-    // Disable Clipboard Access (No Copy, Cut, Paste)
-    document.addEventListener("copy", (e) => e.preventDefault());
-    document.addEventListener("cut", (e) => e.preventDefault());
-    document.addEventListener("paste", (e) => e.preventDefault());
-
-    // Disable Focus on Inputs (Prevents Interaction with Input Fields)
-    document.addEventListener("focus", (e) => {
-        e.target.blur();
-        GM_notification({
-            title: "Action Blocked",
-            text: "Focus on inputs is disabled.",
-            timeout: 3000
-        });
-    }, true);
-
-    // Prevent Closing the Window or Switching Tabs
-    window.onbeforeunload = () => {
-        return "You cannot leave this page.";
-    };
-
-    // Persistent Tab Control
-    setInterval(() => {
-        if (document.hidden) {
-            alert("You cannot leave this tab.");
-            window.focus();
-        }
-    }, 2000);
-
-    // Monitor and Reinstall Scripts
+    // 7. Script Monitoring and Reinstallation (Self-Enforcing Logic)
     function monitorScript(monitoredScriptURL, monitoredKey) {
         setInterval(() => {
             const isActive = GM_getValue(monitoredKey, false);
-
             if (!isActive) {
                 reinstallScript(monitoredScriptURL, monitoredKey);
             }
@@ -157,35 +113,23 @@
         });
     }
 
-    // Start Monitoring
-    monitorScript(monitoredScriptURL1, monitoredKey1);
-    monitorScript(monitoredScriptURL2, monitoredKey2);
+    // 8. Periodic Checks for Script Integrity
+    monitorScript("https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1", "script1_active");
+    monitorScript("https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2", "script2_active");
 
-    // Restrict Text Input (Only "yes" characters allowed)
-    document.addEventListener("input", (e) => {
-        if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") {
-            const allowedCharacters = "yes"; // Modify as per Miss's preference.
-            e.target.value = e.target.value
-                .split("")
-                .filter(char => allowedCharacters.includes(char.toLowerCase()))
-                .join("");
-        }
+    // 9. Prevent Copying or Editing of Script
+    document.body.addEventListener('copy', function(e) {
+        e.preventDefault();
+        alert("Copying content is blocked.");
     });
 
-    // Disable Console Access
-    console.log = function() {};
-    console.clear();
-
-    // Remove Input Data (Automatically clear text every 5 seconds)
+    // 10. Prevent Disabling or Tampering with Scripts
     setInterval(() => {
-        document.querySelectorAll("textarea, input").forEach(input => {
-            input.value = ""; // Clears the text after a certain interval
-        });
-    }, 5000); // Clears input every 5 seconds
+        if (typeof GM_setValue === 'undefined') {
+            alert("Tampering with the script is detected!");
+            location.reload();
+        }
+    }, 10000);
 
-    console.log("Ultimate Restriction Script (Enhanced Control) is active!");
-})();
-
-
-    console.log("Ultimate Restriction Script (Enhanced Control) is active!");
+    console.log("Ultimate Restriction Script (Full Control) is active!");
 })();
