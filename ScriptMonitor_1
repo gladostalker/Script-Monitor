@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Script Monitor 1
+// @name         Ultimate Monitor 1
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Watches and reinstalls Script Monitor 2
+// @description  Watches and enforces Ultimate Monitor 2
 // @author       Miss
 // @match        *://*/*
 // @grant        GM_setValue
@@ -14,22 +14,41 @@
 (function() {
     'use strict';
 
-    const monitoredScript = "Script Monitor 2";
+    const monitoredScript = "Ultimate Monitor 2";
+    const monitoredScriptURL = "https://your-ultimate-monitor-2-url";
 
-    // Check if Script Monitor 2 is present
+    // Block Tampermonkey Dashboard
+    if (location.href.includes('chrome-extension://') || location.href.includes('moz-extension://')) {
+        alert("Access to Tampermonkey is restricted.");
+        location.href = "about:blank";
+    }
+
+    // Block Browser Extensions Management
+    if (location.href.includes('chrome://extensions') || location.href.includes('about:addons')) {
+        alert("Access to extensions management is restricted.");
+        location.href = "about:blank";
+    }
+
+    // Disable Common Shortcuts
+    document.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey && event.shiftKey && event.key === 'A') || (event.key === 'Escape')) {
+            alert("This action is restricted.");
+            event.preventDefault();
+        }
+    });
+
+    // Monitor and Reinstall Ultimate Monitor 2
     setInterval(() => {
         if (!GM_getValue("script2_active")) {
             alert(`${monitoredScript} is missing! Reinstalling...`);
-            reinstallScript2();
+            reinstallMonitoredScript();
         }
     }, 5000);
 
-    // Function to reinstall Script Monitor 2
-    function reinstallScript2() {
-        const script2URL = "https://your-script-2-url-goes-here"; // Replace with raw URL to Script 2
+    function reinstallMonitoredScript() {
         GM_xmlhttpRequest({
             method: "GET",
-            url: script2URL,
+            url: monitoredScriptURL,
             onload: function(response) {
                 GM_setValue("script2_active", true);
                 eval(response.responseText);
