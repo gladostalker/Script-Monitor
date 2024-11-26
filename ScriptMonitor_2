@@ -15,7 +15,7 @@
     'use strict';
 
     const monitoredScript = "Ultimate Monitor 1";
-    const monitoredScriptURL = "https://your-ultimate-monitor-2-url";
+    const monitoredScriptURL = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1";
 
     // Block Tampermonkey Dashboard
     if (location.href.includes('chrome-extension://') || location.href.includes('moz-extension://')) {
