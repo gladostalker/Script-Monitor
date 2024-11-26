@@ -1,60 +1,142 @@
 // ==UserScript==
-// @name         Ultimate Monitor 1
+// @name         Ultimate Restriction Script (Enhanced Control)
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Watches and enforces Ultimate Monitor 2
+// @version      3.0
+// @description  Enforces extreme restrictions, self-monitors, prevents tampering, and limits text input freedom.
 // @author       Miss
 // @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
+// @grant        GM_notification
+// @grant        GM_addStyle
 // @run-at       document-start
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    const monitoredScript = "Ultimate Monitor 2";
-    const monitoredScriptURL = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2";
+    // Settings
+    const monitoredScriptURL2 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2";
+    const monitoredKey1 = "script1_active";
+    const monitoredKey2 = "script2_active";
 
-    // Block Tampermonkey Dashboard
-    if (location.href.includes('chrome-extension://') || location.href.includes('moz-extension://')) {
-        alert("Access to Tampermonkey is restricted.");
-        location.href = "about:blank";
-    }
-
-    // Block Browser Extensions Management
-    if (location.href.includes('chrome://extensions') || location.href.includes('about:addons')) {
-        alert("Access to extensions management is restricted.");
-        location.href = "about:blank";
-    }
-
-    // Disable Common Shortcuts
-    document.addEventListener('keydown', function(event) {
-        if ((event.ctrlKey && event.shiftKey && event.key === 'A') || (event.key === 'Escape')) {
-            alert("This action is restricted.");
-            event.preventDefault();
-        }
-    });
-
-    // Monitor and Reinstall Ultimate Monitor 2
+    // Prevent Access to Tampermonkey and Restricted Sites
+    const prohibitedSites = ["tampermonkey", "chrome://extensions"];
     setInterval(() => {
-        if (!GM_getValue("script2_active")) {
-            alert(`${monitoredScript} is missing! Reinstalling...`);
-            reinstallMonitoredScript();
-        }
+        prohibitedSites.forEach(site => {
+            if (window.location.href.includes(site)) {
+                alert("Access to this site is restricted.");
+                window.close();
+            }
+        });
     }, 5000);
 
-    function reinstallMonitoredScript() {
+    // Monitor DevTools Usage
+    const detectDevTools = () => {
+        const devtools = /./;
+        devtools.toString = function() {
+            this.opened = true;
+        };
+        console.log("%c", devtools);
+        if (devtools.opened) {
+            alert("Developer Tools access is restricted.");
+            location.reload();
+        }
+    };
+    setInterval(detectDevTools, 1000);
+
+    // Persistent Themes and Visual Indicators
+    GM_addStyle(`
+        body {
+            background-color: pink !important;
+            color: white !important;
+        }
+        #top-banner {
+            content: "Submission enforced.";
+            font-size: 20px;
+            color: red;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 1000;
+            background-color: black;
+        }
+    `);
+
+    // Disable Common Keyboard Shortcuts
+    document.addEventListener("keydown", (e) => {
+        const blockedKeys = [
+            { ctrl: true, shift: true, key: "I" },
+            { ctrl: true, shift: true, key: "A" },
+            { ctrl: true, key: "W" }
+        ];
+        blockedKeys.forEach(shortcut => {
+            if (e.ctrlKey === shortcut.ctrl && e.shiftKey === shortcut.shift && e.key.toUpperCase() === shortcut.key) {
+                e.preventDefault();
+                GM_notification({
+                    title: "Action Blocked",
+                    text: `Shortcut "${shortcut.key}" is not allowed.`,
+                    timeout: 3000
+                });
+            }
+        });
+    });
+
+    // Persistent Tab Control
+    window.onbeforeunload = () => {
+        return "You cannot close this tab.";
+    };
+
+    // Monitor and Reinstall Scripts
+    function monitorScript(monitoredScriptURL, monitoredKey) {
+        setInterval(() => {
+            const isActive = GM_getValue(monitoredKey, false);
+
+            if (!isActive) {
+                reinstallScript(monitoredScriptURL, monitoredKey);
+            }
+        }, 10000);
+    }
+
+    function reinstallScript(url, key) {
         GM_xmlhttpRequest({
             method: "GET",
-            url: monitoredScriptURL,
+            url: url,
             onload: function(response) {
-                GM_setValue("script2_active", true);
-                eval(response.responseText);
+                try {
+                    eval(response.responseText);
+                    GM_setValue(key, true);
+                    GM_notification({
+                        title: "Script Reinstalled",
+                        text: `${key} has been reinstalled.`,
+                        timeout: 3000
+                    });
+                } catch (e) {
+                    console.error(`Failed to reinstall ${key}:`, e);
+                }
+            },
+            onerror: function(error) {
+                console.error(`Failed to fetch ${url}:`, error);
             }
         });
     }
 
-    GM_setValue("script1_active", true); // Mark this script as active
+    // Start Monitoring
+    monitorScript(monitoredScriptURL1, monitoredKey1);
+    monitorScript(monitoredScriptURL2, monitoredKey2);
+
+    // Restrict Text Input
+    document.addEventListener("input", (e) => {
+        if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") {
+            const allowedCharacters = "yes"; // Modify as per Miss's preference.
+            e.target.value = e.target.value
+                .split("")
+                .filter(char => allowedCharacters.includes(char.toLowerCase()))
+                .join("");
+        }
+    });
+
+    console.log("Ultimate Restriction Script (Enhanced Control) is active!");
 })();
