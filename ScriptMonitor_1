@@ -17,6 +17,7 @@
     'use strict';
 
     // Settings
+    const monitoredScriptURL1 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_1";
     const monitoredScriptURL2 = "https://github.com/gladostalker/Script-Monitor/blob/main/ScriptMonitor_2";
     const monitoredKey1 = "script1_active";
     const monitoredKey2 = "script2_active";
